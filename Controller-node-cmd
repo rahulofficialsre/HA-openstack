@@ -1,0 +1,91 @@
+openstack project create --domain default --description "Service Project" service
+output :- 
++-------------+----------------------------------+
+| Field       | Value                            |
++-------------+----------------------------------+
+| description | Service Project                  |
+| domain_id   | default                          |
+| enabled     | True                             |
+| id          | ee6e143082ef496ab04a15a65a531be4 |
+| is_domain   | False                            |
+| name        | service                          |
+| options     | {}                               |
+| parent_id   | default                          |
+| tags        | []                               |
++-------------+----------------------------------+
+
+openstack user create --domain default --password GLANCE_PASS glance
++---------------------+----------------------------------+
+| Field               | Value                            |
++---------------------+----------------------------------+
+| default_project_id  | None                             |
+| domain_id           | default                          |
+| email               | None                             |
+| enabled             | True                             |
+| id                  | 395ff253ead146a9b5b60f196cddfaf1 |
+| name                | glance                           |
+| description         | None                             |
+| password_expires_at | None                             |
++---------------------+----------------------------------+
+
+openstack role add --project service --user glance admin
+
+#openstack service create --name glance --description "OpenStack Image" image
+openstack service create --name glance --description "OpenStack Image service" image
++-------------+----------------------------------+
+| Field       | Value                            |
++-------------+----------------------------------+
+| id          | c7dfde1a68e744c9a786e80d218816b9 |
+| name        | glance                           |
+| type        | image                            |
+| enabled     | True                             |
+| description | OpenStack Image service          |
++-------------+----------------------------------+
+
+openstack endpoint create --region RegionOne image public http://172.20.3.10:9292
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | e7531a594ae24602baebba6b73a70dee |
+| interface    | public                           |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | c7dfde1a68e744c9a786e80d218816b9 |
+| service_name | glance                           |
+| service_type | image                            |
+| url          | http://172.20.3.10:9292          |
++--------------+----------------------------------+
+
+openstack endpoint create --region RegionOne image internal http://172.20.3.10:9292
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | 05bbc315cc0c4f67be2ceacf9ba0855d |
+| interface    | internal                         |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | c7dfde1a68e744c9a786e80d218816b9 |
+| service_name | glance                           |
+| service_type | image                            |
+| url          | http://172.20.3.10:9292          |
++--------------+----------------------------------+
+openstack endpoint create --region RegionOne image admin http://172.20.3.10:9292
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | 3a5776cd4c9f4ed0bcc924b6e4e17ac8 |
+| interface    | admin                            |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | c7dfde1a68e744c9a786e80d218816b9 |
+| service_name | glance                           |
+| service_type | image                            |
+| url          | http://172.20.3.10:9292          |
++--------------+----------------------------------+
+
+
+
+
