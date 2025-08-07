@@ -1,3 +1,4 @@
 This on All 3 Controllers:
 apt install glance -y
 
+techr-openstack
