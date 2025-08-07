@@ -1,4 +1,72 @@
-This on All 3 Controllers:
-apt install glance -y
+### This on All 3 Controllers:
+1. apt install glance -y
+2. Configure /etc/glance/glance-api.conf
+    nano /etc/glance/glance-api.conf
 
-techr-openstack
+    [database]
+    connection = mysql+pymysql://glance:GLANCE_DB_PASS@172.20.3.10/glance
+    
+    [keystone_authtoken]
+    www_authenticate_uri = http://172.20.3.10:5000
+    auth_url = http://172.20.3.10:5000
+    memcached_servers = 172.20.3.10:11211
+    auth_type = password
+    project_domain_name = Default
+    user_domain_name = Default
+    project_name = service
+    username = glance
+    password = GLANCE_PASS
+    
+    [glance_store]
+    stores = file
+    default_store = file
+    filesystem_store_datadir = /var/lib/glance/images/
+    
+    [oslo_messaging_rabbit]
+    rabbit_userid = openstack
+    rabbit_password = techr-openstack
+    rabbit_hosts = 172.20.3.10
+
+    bind_host = <controrell-ip>
+    bind_port = 9292
+
+3. Sync the Glance Database (Only on 1 Controller)
+    su -s /bin/bash glance -c "glance-manage db_sync"
+✅ Do this only on tech-ctrl1.
+
+4. Configure HAProxy for Glance (on all controllers)
+  Add this to /etc/haproxy/haproxy.cfg:
+
+haproxy
+frontend glance_api
+    bind 172.20.3.10:9292
+    default_backend glance_backend
+
+backend glance_backend
+    option httpchk GET /versions
+    http-check expect status 200
+    balance roundrobin
+    server tech-ctrl1 172.20.3.11:9292 check fall 3 rise 2
+    server tech-ctrl2 172.20.3.12:9292 check fall 3 rise 2
+    server tech-ctrl3 172.20.3.13:9292 check fall 3 rise 2
+
+Then restart:
+systemctl reload haproxy
+
+5. Restart Glance on All Controllers
+systemctl restart glance-api
+systemctl enable glance-api
+
+✅ 6. Verify Glance Service (from any controller)
+source /root/admin-openrc.sh
+openstack image service list
+
+Also test:
+curl http://172.20.3.10:9292
+
+
+
+
+
+
+
